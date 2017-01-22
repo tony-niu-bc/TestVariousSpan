@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TestVariousSpan</string>
+    <string name="goto_other_activity">跳转到其它Activity界面，默认有下划线\n关键字颜色为样式colorAccent指定的</string>
+</resources>
