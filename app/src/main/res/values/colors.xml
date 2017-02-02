@@ -4,4 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorSpecific">#CC8081</color>
+
+    <color name="listview_item_pressed">#f0f0f0</color>
+    <color name="listview_item_normal">#ffffff</color>
+
 </resources>

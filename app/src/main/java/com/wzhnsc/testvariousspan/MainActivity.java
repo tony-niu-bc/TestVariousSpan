@@ -17,19 +17,20 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.method.LinkMovementMethod;
+import android.text.method.Touch;
 import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -119,132 +120,11 @@ public class MainActivity extends AppCompatActivity {
         // ---------------------------------------------------------------------------------------//
 
         // Begin - 跳转到其它Activity界面
-        abstract class ClickableImageSpan extends ImageSpan { // ImageSpan - 文本插入图片
-
-            public int getSize(Paint                paint,
-                               CharSequence         text,
-                               int                  start,
-                               int                  end,
-                               Paint.FontMetricsInt fontMetricsInt) {
-                Drawable drawable = getDrawable();
-                Rect rect = drawable.getBounds();
-
-                if (fontMetricsInt != null) {
-                    Paint.FontMetricsInt fmPaint    = paint.getFontMetricsInt();
-                    int                  fontHeight = fmPaint.bottom - fmPaint.top;
-                    int                  drawHeight = rect.bottom - rect.top;
-
-                    int top    = drawHeight / 2 - fontHeight / 4;
-                    int bottom = drawHeight / 2 + fontHeight / 4;
-
-                    fontMetricsInt.ascent  = -bottom;
-                    fontMetricsInt.top     = -bottom;
-                    fontMetricsInt.bottom  = top;
-                    fontMetricsInt.descent = top;
-                }
-
-                return rect.right;
-            }
-
-            @Override
-            public void draw(Canvas       canvas,
-                             CharSequence text,
-                             int          start,
-                             int          end,
-                             float        x,
-                             int          top,
-                             int          y,
-                             int          bottom,
-                             Paint        paint) {
-                Drawable drawable = getDrawable();
-                canvas.save();
-
-                canvas.translate(x,
-                                 (((bottom - top) -
-                                 drawable.getBounds().bottom -
-                                 getResources().getDimension(R.dimen.margin_9_dp)) / 2 + top));
-                drawable.draw(canvas);
-
-                canvas.restore();
-            }
-
-            public ClickableImageSpan(Drawable b) {
-                super(b);
-            }
-
-            abstract void onClick(View view);
-        }
-
-        // TextView.setMovementMethod(LinkMovementMethod.getInstance())可点击超链接，
-        // 但在 ListView 里点击列表项时没有任何反应了，
-        // 所以修改 LinkMovementMethod::onTouchEvent 方法
-        class ClickableMovementMethod extends LinkMovementMethod {
-            public boolean onTouchEvent(TextView    widget,
-                                        Spannable   buffer,
-                                        MotionEvent event) {
-                int action = event.getAction();
-
-                if (action == MotionEvent.ACTION_UP ||
-                        action == MotionEvent.ACTION_DOWN) {
-                    int x = (int) event.getX();
-                    int y = (int) event.getY();
-
-                    x -= widget.getTotalPaddingLeft();
-                    y -= widget.getTotalPaddingTop();
-
-                    x += widget.getScrollX();
-                    y += widget.getScrollY();
-
-                    Layout layout = widget.getLayout();
-                    int line = layout.getLineForVertical(y);
-                    int off  = layout.getOffsetForHorizontal(line, x);
-
-                    // 获取 TextView 里的超链接对象，并装入 ClickableSpan 数组
-                    ClickableSpan[]      link       = buffer.getSpans(off, off, ClickableSpan.class);
-                    ClickableImageSpan[] imageSpans = buffer.getSpans(off, off, ClickableImageSpan.class);
-
-                    // 此处是对超链接点击事件进行处理
-                    if (link.length != 0) {
-                        if (action == MotionEvent.ACTION_UP) {
-                            link[0].onClick(widget);
-                        }
-                        else if (action == MotionEvent.ACTION_DOWN) {
-                            Selection.setSelection(buffer,
-                                                   buffer.getSpanStart(link[0]),
-                                                   buffer.getSpanEnd(link[0]));
-                        }
-
-                        // 处理结束后返回 true
-                        // 这里一定要注意：当返回值为 true 时则表示点击事件已经被处理，不会继续传递了！
-                        return true;
-                    }
-                    else if (imageSpans.length != 0) {
-                        if (action == MotionEvent.ACTION_UP) {
-                            imageSpans[0].onClick(widget);
-                        }
-                        else if (action == MotionEvent.ACTION_DOWN) {
-                            Selection.setSelection(buffer,
-                                                   buffer.getSpanStart(imageSpans[0]),
-                                                   buffer.getSpanEnd(imageSpans[0]));
-                        }
-
-                        return true;
-                    }
-                    else {
-                        Selection.removeSelection(buffer);
-                    }
-                }
-
-                // 当返回值为 false 时则表示点击事件未处理，继续传递！
-                return false;
-            }
-        }
-
         // 计算出 Activity 在字符串的起末位置
         matcher = pattern.matcher("跳转到其它Activity界面\n无下划线且改变字体颜色");
 
         if (matcher.find()) {
-            ((TextView)findViewById(R.id.tv_goto_other_activity)).setMovementMethod(ClickableMovementMethod.getInstance());
+            ((TextView)findViewById(R.id.tv_goto_other_activity)).setMovementMethod(LinkMovementMethod.getInstance());
 
             SpannableString ss = new SpannableString("跳转到其它Activity界面\n无下划线且改变字体颜色");
 
@@ -287,7 +167,7 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(MainActivity.this, "ListView position = " + position, Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "onItemClick - ListView position = " + position, Toast.LENGTH_SHORT).show();
             }
         });
         lv.setAdapter(new BaseAdapter() {
@@ -307,16 +187,45 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+            public View getView(final int position, View convertView, ViewGroup parent) {
                 if (null == convertView) {
-                    convertView = new TextView(MainActivity.this);
-                    ListView.LayoutParams lp = new ListView.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                                                                         ViewGroup.LayoutParams.WRAP_CONTENT);
-                    convertView.setLayoutParams(lp);
+                    LinearLayout ll = new LinearLayout(MainActivity.this);
+                    ListView.LayoutParams lp = new ListView.LayoutParams(ListView.LayoutParams.MATCH_PARENT,
+                                                                         ListView.LayoutParams.MATCH_PARENT);
+                    ll.setLayoutParams(lp);
+                    ll.setGravity(Gravity.CENTER);
+                    ll.setOrientation(LinearLayout.VERTICAL);
+                    ll.setBackgroundResource(R.drawable.selector_listview_item_click_bg);
+                    // 正是这一项导致所有条目都要抢占焦点，所以ListView的OnItemClickListener.onItemClick点击事件失效
+                    //ll.setClickable(true);
+                    // 加了如下侦听 onItemClick 就没有响应了
+                    ll.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Toast.makeText(MainActivity.this, "LinearLayout.OnClickListener - ListView position = " + position, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    LinearLayout.LayoutParams llp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                                                  LinearLayout.LayoutParams.WRAP_CONTENT);
+                    llp.setMargins(5, 5, 5, 5);
+                    llp.gravity = Gravity.CENTER;
+
+                    TextView tv = new TextView(MainActivity.this);
+                    tv.setLayoutParams(llp);
+                    tv.setText(String.valueOf(position));
+                    // 下面三句加上了连没用ClickableSpan的列表项也无onItemClick响应了
+                    //tv.setFocusable(true);
+                    //tv.setClickable(true);
+                    //tv.setLongClickable(true);
+
+                    ll.addView(tv);
+
+                    convertView = ll;
                 }
 
                 if (0 == position) {
-                    SpannableString ss = new SpannableString("点击本项空白处无Toast");
+                    SpannableString ss = new SpannableString("点击除了此处会弹Toast");
 
                     // 抽象类，需要自己扩展实现
                     ClickableSpan clickableSpan = new ClickableSpan() {
@@ -328,16 +237,16 @@ public class MainActivity extends AppCompatActivity {
                     };
 
                     ss.setSpan(clickableSpan,
-                               1, 7,
+                               2, 6,
                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                    ((TextView)convertView).setText(ss);
+                    ((TextView)((LinearLayout)convertView).getChildAt(0)).setText(ss);
 
-//                    // 使文本的超连接起作用，都必须设置 LinkMovementMethod 对象
-//                    ((TextView)convertView).setMovementMethod(LinkMovementMethod.getInstance());
+                    // 使文本的超连接起作用，都必须设置 LinkMovementMethod 对象
+                    ((TextView)((LinearLayout)convertView).getChildAt(0)).setMovementMethod(LinkMovementMethod.getInstance());
                 }
                 else if (2 == position) {
-                    SpannableString ss = new SpannableString("点击本项空白处有Toast");
+                    SpannableString ss = new SpannableString("点击除了此处会弹Toast");
 
                     // 抽象类，需要自己扩展实现
                     ClickableSpan clickableSpan = new ClickableSpan() {
@@ -349,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
                     };
 
                     ss.setSpan(clickableSpan,
-                               1, 7,
+                               2, 6,
                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     // 设置文字下划线
@@ -364,20 +273,17 @@ public class MainActivity extends AppCompatActivity {
                     };
 
                     ss.setSpan(underlineSpan,
-                               1, 9,
+                               2, 6,
                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-                    ((TextView)convertView).setText(ss);
+                    ((TextView)((LinearLayout)convertView).getChildAt(0)).setText(ss);
 
-//                    // 使文本的超连接起作用，都必须设置 LinkMovementMethod 对象
-//                    ((TextView)convertView).setMovementMethod(ClickableMovementMethod.getInstance());
+                    // 使文本的超连接起作用，都必须设置 LinkMovementMethod 对象
+                    ((TextView)((LinearLayout)convertView).getChildAt(0)).setMovementMethod(LinkMovementMethod.getInstance());
                 }
                 else {
-                    ((TextView)convertView).setText("分隔上下两个有动作的项");
+                    ((TextView)((LinearLayout)convertView).getChildAt(0)).setText("分隔上下两个有动作的项");
                 }
-
-                // 使文本的超连接起作用，都必须设置 LinkMovementMethod 对象
-                ((TextView)convertView).setMovementMethod(ClickableMovementMethod.getInstance());
 
                 return convertView;
             }
