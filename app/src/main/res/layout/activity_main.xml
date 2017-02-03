@@ -58,12 +58,30 @@
             android:hint="Can't input emoji and . ; @ enter space"
             />
 
-        <TextView
-            android:id="@+id/tv_show_emoji"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            />
+            android:orientation="horizontal"
+            android:gravity="start|center"
+            >
+
+            <TextView
+                android:id="@+id/tv_show_emoji"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                />
+
+            <Button
+                android:id="@+id/btn_del_emoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="del"
+                android:textColor="#00abcd"
+                />
+
+        </LinearLayout>
 
     </LinearLayout>
 

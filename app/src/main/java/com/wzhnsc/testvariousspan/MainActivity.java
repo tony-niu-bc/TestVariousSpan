@@ -27,12 +27,14 @@ import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -441,12 +443,52 @@ public class MainActivity extends AppCompatActivity {
         ssImage.setSpan(isNoSeeing,     7,  9, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
         ssImage.setSpan(isNoListening, 12, 14, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        TextView tvShowEmoji = (TextView)findViewById(R.id.tv_show_emoji);
+        final TextView tvShowEmoji = (TextView)findViewById(R.id.tv_show_emoji);
         tvShowEmoji.setText(ssImage);
+
+        // 虽然显示的是将勿言，勿看，勿听改成了图片，但编辑框内的文本依旧是：非礼勿言，非礼勿看，非礼勿听！
+        Log.d("TestVariousSpan", tvShowEmoji.getText().toString());
         // End -
 
         // ---------------------------------------------------------------------------------------//
         // Begin -
+        Button btnDel = (Button)findViewById(R.id.btn_del_emoji);
+        btnDel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 取得文本框信息中所有表情的信息（位置等）
+                ImageSpan[] isArray;
+                CharSequence cs = tvShowEmoji.getText();
+
+                if (0 < cs.length()) {
+                    if (cs instanceof Spanned) {
+                        Spanned content = (Spanned)cs;
+                        isArray = content.getSpans(0, content.length(), ImageSpan.class);
+                        Log.d("TestVariousSpan", "ImageSpan[] size: " + isArray.length);
+
+                        for (int i = isArray.length - 1; i >= 0; --i) {
+                            int start = content.getSpanStart(isArray[i]);
+                            int end   = content.getSpanEnd(isArray[i]);
+
+                            Log.d("TestVariousSpan",
+                                    "ImageSpan[" + i + "] " + "start = " + start + " end = " + end);
+                        }
+
+                        if (0 < isArray.length) {
+                            int start = content.getSpanStart(isArray[isArray.length - 1]);
+                            int end = content.getSpanEnd(isArray[isArray.length - 1]);
+
+                            if (end >= cs.length()) {
+                                tvShowEmoji.setText(cs.subSequence(0, start));
+                                return;
+                            }
+                        }
+                    }
+
+                    tvShowEmoji.setText(cs.subSequence(0, cs.length() - 1));
+                }
+            }
+        });
         // End -
     }
 }
