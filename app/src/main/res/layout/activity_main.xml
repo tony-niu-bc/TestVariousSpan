@@ -54,8 +54,15 @@
             android:id="@+id/et_excluded_emoticon"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:hint="Can't input emoji"
+            android:layout_marginTop="5dp"
+            android:hint="Can't input emoji and . ; @ enter space"
+            />
+
+        <TextView
+            android:id="@+id/tv_show_emoji"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
             />
 
     </LinearLayout>

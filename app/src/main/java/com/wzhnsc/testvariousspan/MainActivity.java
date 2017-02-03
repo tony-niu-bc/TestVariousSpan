@@ -295,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
         // End -
 
         // ---------------------------------------------------------------------------------------//
+        // Begin -
         final int inputMaxLength = 15;
 
         final ExcludedEmoticonEditText et = (ExcludedEmoticonEditText)findViewById(R.id.et_excluded_emoticon);
@@ -408,8 +409,44 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                et.setSelection(s.toString().trim().length());
+//                CharSequence text = et.getText();
+//                if (text instanceof Spannable) {
+//                    Spannable spanText = (Spannable)text;
+//                    Selection.setSelection(spanText, text.length());
+//                }
+                // 光标定于最后
+                et.setSelection(et.getText().length());
             }
         });
+        // End -
+
+
+        // ---------------------------------------------------------------------------------------//
+        // Begin -
+        Drawable  drNoSpeaking = getResources().getDrawable(R.drawable.emoji_1f64a);
+        // 必须设置大小，不然显示不出来
+        drNoSpeaking.setBounds(0, 0, drNoSpeaking.getIntrinsicWidth(), drNoSpeaking.getIntrinsicHeight());
+        ImageSpan isNoSpeaking = new ImageSpan(drNoSpeaking, ImageSpan.ALIGN_BASELINE);
+
+        Drawable  drNoSeeing = getResources().getDrawable(R.drawable.emoji_1f648);
+        drNoSeeing.setBounds(0, 0, drNoSeeing.getIntrinsicWidth(), drNoSeeing.getIntrinsicHeight());
+        ImageSpan isNoSeeing = new ImageSpan(drNoSeeing, ImageSpan.ALIGN_BASELINE);
+
+        Drawable  drNoListening = getResources().getDrawable(R.drawable.emoji_1f649);
+        drNoListening.setBounds(0, 0, drNoListening.getIntrinsicWidth(), drNoListening.getIntrinsicHeight());
+        ImageSpan isNoListening = new ImageSpan(drNoListening, ImageSpan.ALIGN_BASELINE);
+
+        SpannableString ssImage = new SpannableString("非礼勿言，非礼勿看，非礼勿听！");
+        ssImage.setSpan(isNoSpeaking,   2,  4, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssImage.setSpan(isNoSeeing,     7,  9, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ssImage.setSpan(isNoListening, 12, 14, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        TextView tvShowEmoji = (TextView)findViewById(R.id.tv_show_emoji);
+        tvShowEmoji.setText(ssImage);
+        // End -
+
+        // ---------------------------------------------------------------------------------------//
+        // Begin -
+        // End -
     }
 }
