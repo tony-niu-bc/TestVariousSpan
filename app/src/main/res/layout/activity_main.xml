@@ -1,61 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.wzhnsc.testvariousspan.MainActivity"
-    android:id="@+id/activity_main"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/activity_vertical_margin"
-    android:orientation="vertical"
-    android:gravity="center"
+    android:scrollbars="none"
     >
 
-    <TextView
-        android:id="@+id/tv_goto_my_blog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        />
-
-    <TextView
-        android:id="@+id/tv_change_keyword_color"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        />
-
-    <TextView
-        android:id="@+id/tv_goto_other_activity_underline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        />
-
-    <TextView
-        android:id="@+id/tv_goto_other_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        />
-
-    <ListView
-        android:id="@+id/lv_click_item"
+    <LinearLayout
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="com.wzhnsc.testvariousspan.MainActivity"
+        android:id="@+id/activity_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:padding="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        android:gravity="center"
+        >
 
-    <com.wzhnsc.testvariousspan.ExcludedEmoticonEditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:hint="Can't input emoji"
-        />
+        <TextView
+            android:id="@+id/tv_goto_my_blog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:hint="Can't input emoji"
-        />
+        <TextView
+            android:id="@+id/tv_change_keyword_color"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/tv_goto_other_activity_underline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            />
+
+        <TextView
+            android:id="@+id/tv_goto_other_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            />
+
+        <ListView
+            android:id="@+id/lv_click_item"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+
+        <com.wzhnsc.testvariousspan.ExcludedEmoticonEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Can't input emoji"
+            />
+
+    </LinearLayout>
+
+</ScrollView>

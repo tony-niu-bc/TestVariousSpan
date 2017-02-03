@@ -56,6 +56,7 @@ public class ExcludedEmoticonEditText extends EditText {
                     // 手机自带输入法会出现数组越界情况，所以 catch 后正常输入
                     if (!mIsUseOldText) {
                         // 表情符号的字符长度最小为2
+                        // ☺️<- 两字节，一个 java char 的表情无法筛掉
                         if (count >= 2) {
                             CharSequence emoticon = s.subSequence(mOldCursorPos, mOldCursorPos + count);
 
