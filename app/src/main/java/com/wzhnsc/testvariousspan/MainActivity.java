@@ -36,6 +36,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -294,6 +295,8 @@ public class MainActivity extends AppCompatActivity {
                 return convertView;
             }
         });
+
+        setListViewHeightBasedOnChildren(lv);
         // End -
 
         // ---------------------------------------------------------------------------------------//
@@ -490,5 +493,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         // End -
+    }
+
+    /**
+     * 动态设置ListView的高度
+     * @param listView
+     * Adapter 中 getView 方法返回的 View 的必须由 LinearLayout 组成，
+     * 因为只有 LinearLayout 才有 measure 方法，
+     * 如果使用其他的布局如 RelativeLayout ，在调用 listItem.measure(0, 0); 时就会抛异常，
+     * 因为除 LinearLayout 外的其他布局的这个方法就是直接抛异常的
+     */
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        if (listView == null) {
+            return;
+        }
+
+        ListAdapter listAdapter = listView.getAdapter();
+
+        if (listAdapter == null) {
+            return; // pre-condition
+        }
+
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
     }
 }
