@@ -9,6 +9,8 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputFilter;
 import android.text.Layout;
 import android.text.Selection;
 import android.text.Spannable;
@@ -16,6 +18,8 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.method.Touch;
 import android.text.style.ClickableSpan;
@@ -291,5 +295,121 @@ public class MainActivity extends AppCompatActivity {
         // End -
 
         // ---------------------------------------------------------------------------------------//
+        final int inputMaxLength = 15;
+
+        final ExcludedEmoticonEditText et = (ExcludedEmoticonEditText)findViewById(R.id.et_excluded_emoticon);
+
+        // 以下为两种字符输入限制，限制的字符只是举例而已
+        // 仅限制软键输入
+        et.setFilters(new InputFilter[]{new InputFilter.LengthFilter(inputMaxLength),
+                new InputFilter() {
+                    @Override
+                    public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+                        // 返回 null 表示接收输入的字符，返回空字符串表示不接受输入的字符
+                        if (source.equals("\f")   // 换页符
+                         || source.equals(" ")    // 英文空格符
+                         || source.equals("　")   // 中文空格符
+                         || source.equals("\b")   // 退格符
+                         || source.equals("\t")   // 制表符
+                         || source.equals("\r")   // 回车符
+                         || source.equals("\n")   // 换行符
+                         || source.equals(".")    // 英文句号
+                         || source.equals(";")    // 英文分号
+                         || source.equals("@")) { // 换行符
+                            return "";
+                        }
+
+                        return null;
+                    }
+                }});
+
+        // 限制软键盘和粘贴输入
+        et.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (0 < et.getText().length()) {
+                    // 换页符
+                    if (s.toString().contains("\f")) {
+                        et.setText(s.toString().replace("\f", ""));
+                        return;
+                    }
+
+                    // 退格符
+                    if (s.toString().contains("\b")) {
+                        et.setText(s.toString().replace("\b", ""));
+                        return;
+                    }
+
+                    // 制表符
+                    if (s.toString().contains("\t")) {
+                        et.setText(s.toString().replace("\t", ""));
+                        return;
+                    }
+
+                    // 回车符
+                    if (s.toString().contains("\r")) {
+                        et.setText(s.toString().replace("\r", ""));
+                        return;
+                    }
+
+                    // 换行符
+                    if (s.toString().contains("\n")) {
+                        et.setText(s.toString().replace("\n", ""));
+                        return;
+                    }
+
+                    // 英文空格符
+                    if (s.toString().contains(" ")) {
+                        et.setText(s.toString().replace(" ", ""));
+                        return;
+                    }
+
+                    // 中文空格符
+                    if (s.toString().contains("　")) {
+                        et.setText(s.toString().replace("　", ""));
+                        return;
+                    }
+
+                    // 英文分号
+                    if (s.toString().contains(";")) {
+                        et.setText(s.toString().replace(";", ""));
+                        return;
+                    }
+
+                    // 全为空白符清空
+                    if (TextUtils.equals("", s.toString().trim())) {
+                        et.setText("");
+                        return;
+                    }
+
+                    // 英文句号
+                    if (s.toString().contains(".")) {
+                        et.setText(s.toString().replace(".",""));
+                        return;
+                    }
+                    // 英文@符
+                    if (s.toString().contains("@")) {
+                        et.setText(s.toString().replace("@",""));
+                        return;
+                    }
+
+                    if (s.length() > inputMaxLength) {
+                        et.setText(s.toString().substring(0, inputMaxLength));
+                        et.setSelection(inputMaxLength);
+                        return;
+                    }
+                }
+
+                et.setSelection(s.toString().trim().length());
+            }
+        });
     }
 }
